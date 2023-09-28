@@ -75,7 +75,7 @@ class KNearestNeighbor:
                 # not use a loop over dimension, nor use np.linalg.norm().          #
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+                dists[i, j] = np.sqrt(np.sum(np.square(X[i] - self.X_train[j])))
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -97,7 +97,7 @@ class KNearestNeighbor:
             # Do not use np.linalg.norm().                                        #
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+            dists[i] = np.sqrt(X[i] @ X[i] - 2.0 * X[i] @ self.X_train.T + (self.X_train * self.X_train).sum(axis=1))
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -125,8 +125,10 @@ class KNearestNeighbor:
         #       and two broadcast sums.                                         #
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-        # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+        dists = np.sqrt((X * X).sum(axis=1).reshape(num_test, -1).repeat(num_train, 1) +
+                        (self.X_train * self. X_train).sum(axis=1).reshape(-1, num_train).repeat(num_test, 0) +
+                        - 2.0 * X @ self.X_train.T)
+        # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****3
         return dists
 
     def predict_labels(self, dists, k=1):
@@ -155,7 +157,8 @@ class KNearestNeighbor:
             # Hint: Look up the function numpy.argsort.                             #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+            idxs = np.argsort(dists[i])[:k]
+            closest_y = [self.y_train[i] for i in idxs]
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
             # TODO:                                                                 #
@@ -165,8 +168,9 @@ class KNearestNeighbor:
             # label.                                                                #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-
+            values, counts = np.unique(closest_y, return_counts=True)
+            modes = values[counts == max(counts)]
+            y_pred[i] = min(modes)
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
         return y_pred
