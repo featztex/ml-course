@@ -20,8 +20,8 @@ class LaplaceDistribution:
         '''
         ####
         # Do not change the class outside of this block
-        self.loc = # YOUR CODE HERE
-        self.scale = # YOUR CODE HERE
+        self.loc = np.median(features, axis=0)
+        self.scale = np.mean(np.abs(features - self.loc), axis=0)
         ####
 
 
@@ -33,7 +33,7 @@ class LaplaceDistribution:
         '''
         ####
         # Do not change the class outside of this block
-        return 
+        return - np.abs(values - self.loc) / self.scale + np.log(1 / (2*self.scale))
         ####
         
     
@@ -43,4 +43,4 @@ class LaplaceDistribution:
         Args:
             values: A numpy array of shape (n_objects, n_features). Every column represents all available values for the selected feature.
         '''
-        return np.exp(self.logpdf(value))
+        return np.exp(self.logpdf(values))
