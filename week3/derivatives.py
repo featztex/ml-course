@@ -33,7 +33,7 @@ class LossAndDerivatives:
         """
 
         # YOUR CODE HERE    
-        return 
+        return np.mean(np.abs(X.dot(w) - Y))
 
     @staticmethod
     def l2_reg(w):
@@ -47,7 +47,7 @@ class LossAndDerivatives:
         """
         
         # YOUR CODE HERE
-        return 
+        return np.sum(w**2)
 
     @staticmethod
     def l1_reg(w):
@@ -61,7 +61,7 @@ class LossAndDerivatives:
         """
 
         # YOUR CODE HERE
-        return 
+        return np.sum(np.abs(w))
 
     @staticmethod
     def no_reg(w):
@@ -87,7 +87,29 @@ class LossAndDerivatives:
         """
 
         # YOUR CODE HERE
-        return 
+
+        N = X.shape[0]
+
+        if len(w.shape) != 1:
+            r = Y.shape[1]
+            der = []
+            for k in range(r):
+                der.append(2 / N * X.T @ (X @ w[:, k] - Y[:, k]))
+            return np.vstack(der).T / r
+        else:      
+            return 2 / N * X.T @ (X @ w - Y)
+
+        '''
+        N, d = X.shape[0], X.shape[1]
+        r = w.shape[1]
+
+        derivative = np.zeros((d, r))
+        for l in range(d):
+            for m in range(r):
+                derivative[l, m] = np.sum(X[:, l] * (X[:, l] * w[l, m] - Y[:, m]))
+
+        return derivative * 2 / (N*r)
+        '''
 
     @staticmethod
     def mae_derivative(X, Y, w):
@@ -103,10 +125,28 @@ class LossAndDerivatives:
         
         Please mention, that in case `target_dimentionality` > 1 the error is averaged along this
         dimension as well, so you need to consider that fact in derivative implementation.
+        
         """
 
         # YOUR CODE HERE
-        return 
+
+        N, d = X.shape[0], X.shape[1]
+
+        if len(w.shape) >= 2:
+            r = Y.shape[1]
+            der = np.zeros((d, r))
+            for p in range(d):
+                for q in range(r):
+                    for j in range(N):
+                        der[p][q] += X[j][p] * np.sign(X[j].T @ w[:, q] - Y[j][q])
+            return der / (N * r)
+        
+        else:
+            der = np.zeros((d,))
+            for p in range(d):
+                for j in range(N):
+                    der[p] += X[j][p] * np.sign(X[j].T @ w - Y[j])
+            return der / N
 
     @staticmethod
     def l2_reg_derivative(w):
@@ -119,7 +159,7 @@ class LossAndDerivatives:
         """
 
         # YOUR CODE HERE
-        return 
+        return 2 * w
 
     @staticmethod
     def l1_reg_derivative(w):
@@ -133,7 +173,7 @@ class LossAndDerivatives:
         """
 
         # YOUR CODE HERE
-        return 
+        return np.sign(w)
 
     @staticmethod
     def no_reg_derivative(w):
@@ -141,4 +181,3 @@ class LossAndDerivatives:
         Simply ignores the derivative
         """
         return np.zeros_like(w)
-
