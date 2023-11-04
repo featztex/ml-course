@@ -1,3 +1,5 @@
+import numpy as np
+
 class SimplifiedBaggingRegressor:
     def __init__(self, num_bags, oob=False):
         self.num_bags = num_bags
@@ -85,12 +87,15 @@ class SimplifiedBaggingRegressor:
         '''
         Compute mean square error for all objects, which have at least one prediction
         '''
-        self._get_averaged_oob_predictions()
-        ###
-        score = 0
-        N = 0
-        for i in range(len(self.data)):
-            if self.oob_predictions[i] != None:
-                score += (self.oob_predictions[i] - self.target[i])**2
-                N += 1
-        return score / N
+        if self.oob == True:
+            self._get_averaged_oob_predictions()
+            ###
+            score = 0
+            N = 0
+            for i in range(len(self.data)):
+                if self.oob_predictions[i] != None:
+                    score += (self.oob_predictions[i] - self.target[i])**2
+                    N += 1
+            return score / N
+        else:
+            print("Need oob=True")
